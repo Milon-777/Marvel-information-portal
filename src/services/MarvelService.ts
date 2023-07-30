@@ -1,12 +1,8 @@
-import { CharacterResponse } from "./ResponseInterfaces";
-
-interface Character {
-    name: string;
-    description: string;
-    thumbnail: string;
-    homepage: string;
-    wiki: string;
-}
+import {
+    CharacterResponse,
+    CharacterFullInfo,
+    CharacterInfo,
+} from "./ResponseInterfaces";
 
 class MarvelService {
     private _apiBase = "https://gateway.marvel.com:443/v1/public/";
@@ -24,26 +20,29 @@ class MarvelService {
         return await res.json();
     };
 
-    public getAllCharacters = (): Promise<CharacterResponse> => {
-        return this.getResource(
+    public getAllCharacters = async (): Promise<Array<CharacterInfo>> => {
+        const res: CharacterResponse = await this.getResource(
             `${this._apiBase}characters?limit=9&offset=210&${this._apiKey}`
         );
+        return res.data.results.map(this._transformCharacter);
     };
 
-    public getCharacterById = async (id: number): Promise<Character> => {
+    public getCharacterById = async (id: number): Promise<CharacterInfo> => {
         const res: CharacterResponse = await this.getResource(
             `${this._apiBase}characters/${id}?${this._apiKey}`
         );
-        return this._transformCharacter(res);
+        return this._transformCharacter(res.data.results[0]);
     };
 
-    private _transformCharacter = (res: CharacterResponse): Character => {
+    private _transformCharacter = (res: CharacterFullInfo): CharacterInfo => {
         return {
-            name: res.data.results[0].name,
-            description: res.data.results[0].description,
-            thumbnail: `${res.data.results[0].thumbnail.path}.${res.data.results[0].thumbnail.extension}`,
-            homepage: res.data.results[0].urls[0].url,
-            wiki: res.data.results[0].urls[1].url,
+            name: res.name,
+            description: res.description
+                ? `${res.description.slice(0, 210)}...`
+                : "There is no description for this character",
+            thumbnail: `${res.thumbnail.path}.${res.thumbnail.extension}`,
+            homepage: res.urls[0].url,
+            wiki: res.urls[1].url,
         };
     };
 }

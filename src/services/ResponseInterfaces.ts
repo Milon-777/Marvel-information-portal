@@ -13,10 +13,10 @@ interface CharacterData {
     limit: number;
     total: number;
     count: number;
-    results: Array<Character>;
+    results: Array<CharacterFullInfo>;
 }
 
-interface Character {
+interface CharacterFullInfo {
     id: number;
     name: string;
     description: string;
@@ -28,6 +28,14 @@ interface Character {
     stories: Array<List>;
     events: Array<List>;
     series: Array<List>;
+}
+
+interface CharacterInfo {
+    name: string;
+    description: string;
+    thumbnail: string;
+    homepage: string;
+    wiki: string;
 }
 
 interface Url {
@@ -52,4 +60,4 @@ interface Summary {
     name: string;
 }
 
-export type { CharacterResponse };
+export type { CharacterResponse, CharacterFullInfo, CharacterInfo, Image, Url };

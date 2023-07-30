@@ -2,14 +2,11 @@ import { Component } from "react";
 import "./randomCharacter.scss";
 import mjolnir from "../../resources/img/mjolnir.png";
 import MarvelService from "../../services/MarvelService";
+import { CharacterInfo } from "../../services/ResponseInterfaces";
 
-type nullOrString = null | string;
+interface Character extends Record<keyof CharacterInfo, null | string> {}
 interface State {
-    name: nullOrString;
-    description: nullOrString;
-    thumbnail: nullOrString;
-    homepage: nullOrString;
-    wiki: nullOrString;
+    character: Character;
 }
 interface Props {}
 
@@ -20,24 +17,32 @@ class RandomCharacter extends Component<Props, State> {
     }
 
     state = {
-        name: null,
-        description: null,
-        thumbnail: null,
-        homepage: null,
-        wiki: null,
+        character: {
+            name: null,
+            description: null,
+            thumbnail: null,
+            homepage: null,
+            wiki: null,
+        },
     };
 
     marvelService = new MarvelService();
 
+    onCharacterLoaded = (character: Character): void => {
+        this.setState({ character });
+    };
+
     updateCharacter = (): void => {
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-        this.marvelService.getCharacterById(id).then((res) => {
-            this.setState(res);
-        });
+        this.marvelService.getCharacterById(id).then(this.onCharacterLoaded);
     };
 
     render() {
-        const { name, description, thumbnail, homepage, wiki } = this.state;
+        const {
+            character: { name, description, thumbnail, homepage, wiki },
+        } = this.state;
+
+        console.log(`descr: ${description}`);
 
         return (
             <div className="random-character">
@@ -49,7 +54,9 @@ class RandomCharacter extends Component<Props, State> {
                     />
                     <div className="random-character__info">
                         <p className="random-character__name">{name}</p>
-                        <p className="random-character__descr">{description}</p>
+                        <p className="random-character__descr">
+                            {description ?? "No description"}
+                        </p>
                         <div className="random-character__btns">
                             <a
                                 href={homepage ?? "#"}
