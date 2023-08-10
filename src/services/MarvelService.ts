@@ -7,6 +7,7 @@ import {
 class MarvelService {
     private _apiBase = "https://gateway.marvel.com:443/v1/public/";
     private _apiKey = "apikey=748e83ba2c9bf92e5102e19762a1d9d9";
+    private _baseOffset = 210;
 
     private getResource = async (
         url: string
@@ -20,9 +21,11 @@ class MarvelService {
         return await res.json();
     };
 
-    public getAllCharacters = async (): Promise<Array<CharacterInfo>> => {
+    public getAllCharacters = async (
+        offset: number = this._baseOffset
+    ): Promise<Array<CharacterInfo>> => {
         const res: CharacterResponse = await this.getResource(
-            `${this._apiBase}characters?limit=9&offset=210&${this._apiKey}`
+            `${this._apiBase}characters?limit=9&offset=${offset}&${this._apiKey}`
         );
         return res.data.results.map(this._transformCharacter);
     };
@@ -36,6 +39,7 @@ class MarvelService {
 
     private _transformCharacter = (res: CharacterFullInfo): CharacterInfo => {
         return {
+            id: res.id,
             name: res.name,
             description: res.description
                 ? `${res.description.slice(0, 210)}...`
@@ -43,6 +47,7 @@ class MarvelService {
             thumbnail: `${res.thumbnail.path}.${res.thumbnail.extension}`,
             homepage: res.urls[0].url,
             wiki: res.urls[1].url,
+            comics: res.comics,
         };
     };
 }

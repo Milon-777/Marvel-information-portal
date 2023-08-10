@@ -24,18 +24,20 @@ interface CharacterFullInfo {
     resourceURI: string;
     urls: Array<Url>;
     thumbnail: Image;
-    comics: Array<List>;
-    stories: Array<List>;
-    events: Array<List>;
-    series: Array<List>;
+    comics: List;
+    stories: List;
+    events: List;
+    series: List;
 }
 
 interface CharacterInfo {
+    id: number;
     name: string;
     description: string;
     thumbnail: string;
     homepage: string;
     wiki: string;
+    comics: List;
 }
 
 interface Url {

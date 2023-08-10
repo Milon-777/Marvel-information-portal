@@ -6,27 +6,29 @@ import { CharacterInfo } from "../../services/ResponseInterfaces";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 
-interface Character extends Record<keyof CharacterInfo, null | string> {}
+interface Character extends CharacterInfo {}
 interface State {
-    character: Character;
+    character: Character | {};
     loading: boolean;
     error: boolean;
 }
 interface Props {}
 
 class RandomCharacter extends Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-        this.updateCharacter();
-    }
-
     state = {
         character: {
-            name: null,
-            description: null,
-            thumbnail: null,
-            homepage: null,
-            wiki: null,
+            id: 0,
+            name: "",
+            description: "",
+            thumbnail: "",
+            homepage: "",
+            wiki: "",
+            comics: {
+                available: 0,
+                returned: 0,
+                collectionURI: "string",
+                items: [],
+            },
         },
         loading: true,
         error: false,
@@ -34,8 +36,16 @@ class RandomCharacter extends Component<Props, State> {
 
     marvelService = new MarvelService();
 
+    componentDidMount(): void {
+        this.updateCharacter();
+    }
+
     onCharacterLoaded = (character: Character): void => {
         this.setState({ character, loading: false });
+    };
+
+    onCharacterLoading = (): void => {
+        this.setState({ loading: true });
     };
 
     onError = (): void => {
@@ -44,6 +54,7 @@ class RandomCharacter extends Component<Props, State> {
 
     updateCharacter = (): void => {
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
+        this.onCharacterLoading();
         this.marvelService
             .getCharacterById(id)
             .then(this.onCharacterLoaded)
@@ -70,7 +81,10 @@ class RandomCharacter extends Component<Props, State> {
                     <p className="random-character__title">
                         Or choose another one
                     </p>
-                    <button className="button button__main">
+                    <button
+                        className="button button__main"
+                        onClick={() => this.updateCharacter()}
+                    >
                         <div className="inner">try it</div>
                     </button>
                     <img
@@ -90,20 +104,18 @@ const View: React.FC<Character> = (character) => {
     return (
         <div className="random-character__block">
             <img
-                src={thumbnail ?? "#"}
+                src={thumbnail}
                 alt="Random character"
                 className="random-character__img"
             />
             <div className="random-character__info">
                 <p className="random-character__name">{name}</p>
-                <p className="random-character__descr">
-                    {description ?? "No description"}
-                </p>
+                <p className="random-character__descr">{description}</p>
                 <div className="random-character__btns">
-                    <a href={homepage ?? "#"} className="button button__main">
+                    <a href={homepage} className="button button__main">
                         <div className="inner">Homepage</div>
                     </a>
-                    <a href={wiki ?? "#"} className="button button__secondary">
+                    <a href={wiki} className="button button__secondary">
                         <div className="inner">Wiki</div>
                     </a>
                 </div>

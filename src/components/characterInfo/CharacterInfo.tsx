@@ -1,63 +1,148 @@
-import "./characterInfo.scss";
-import thor from "../../resources/img/thor.jpeg";
+import { Component, ErrorInfo } from "react";
 
-const CharacterInfo = () => {
+import MarvelService from "../../services/MarvelService";
+import Spinner from "../spinner/Spinner";
+import ErrorMessage from "../errorMessage/ErrorMessage";
+import Skeleton from "../skeleton/Skeleton";
+
+import { CharacterInfo as Character } from "../../services/ResponseInterfaces";
+
+import "./characterInfo.scss";
+
+interface State {
+    character: Character;
+    loading: boolean;
+    error: boolean;
+}
+interface Props {
+    characterId: number | null;
+}
+
+class CharacterInfo extends Component<Props, State> {
+    state = {
+        character: {
+            id: 0,
+            name: "",
+            description: "",
+            thumbnail: "",
+            homepage: "",
+            wiki: "",
+            comics: {
+                available: 0,
+                returned: 0,
+                collectionURI: "",
+                items: [],
+            },
+        },
+        loading: false,
+        error: false,
+    };
+
+    marvelService = new MarvelService();
+
+    componentDidMount(): void {
+        this.updateCharacter();
+    }
+
+    componentDidUpdate(
+        prevProps: Readonly<Props>,
+        prevState: Readonly<State>
+    ): void {
+        if (this.props.characterId !== prevProps.characterId) {
+            this.updateCharacter();
+        }
+    }
+
+    onCharacterLoaded = (character: Character): void => {
+        this.setState({ character, loading: false });
+    };
+
+    onCharacterLoading = (): void => {
+        this.setState({ loading: true });
+    };
+
+    onError = (): void => {
+        this.setState({ loading: false, error: true });
+    };
+
+    updateCharacter = () => {
+        const { characterId } = this.props;
+        if (!characterId) {
+            return;
+        }
+
+        this.onCharacterLoading();
+
+        this.marvelService
+            .getCharacterById(characterId)
+            .then(this.onCharacterLoaded)
+            .catch(this.onError);
+    };
+
+    render() {
+        const { character, loading, error } = this.state;
+        const skeleton = character.id || loading || error ? null : <Skeleton />;
+        const errorMessage = error ? <ErrorMessage /> : null;
+        const loadingSpinner = loading ? <Spinner /> : null;
+        const content = !(loading || error || !character.id) ? (
+            <View {...character} />
+        ) : null;
+
+        return (
+            <div className="character__info">
+                {skeleton}
+                {errorMessage}
+                {loadingSpinner}
+                {content}
+            </div>
+        );
+    }
+}
+
+const View: React.FC<Character> = (character) => {
+    const { name, description, thumbnail, homepage, wiki, comics } = character;
+
     return (
-        <div className="character__info">
+        <>
             <div className="character__basics">
-                <img src={thor} alt="abyss" />
+                <img src={thumbnail} alt={name} />
                 <div>
-                    <div className="character__info-name">thor</div>
+                    <div className="character__info-name">{name}</div>
                     <div className="character__btns">
-                        <a href="#" className="button button__main">
+                        <a href={homepage} className="button button__main">
                             <div className="inner">homepage</div>
                         </a>
-                        <a href="#" className="button button__secondary">
+                        <a href={wiki} className="button button__secondary">
                             <div className="inner">Wiki</div>
                         </a>
                     </div>
                 </div>
             </div>
-            <div className="character__descr">
-                In Norse mythology, Loki is a god or jötunn (or both). Loki is
-                the son of Fárbauti and Laufey, and the brother of Helblindi and
-                Býleistr. By the jötunn Angrboða, Loki is the father of Hel, the
-                wolf Fenrir, and the world serpent Jörmungandr. By Sigyn, Loki
-                is the father of Nari and/or Narfi and with the stallion
-                Svaðilfari as the father, Loki gave birth—in the form of a
-                mare—to the eight-legged horse Sleipnir. In addition, Loki is
-                referred to as the father of Váli in the Prose Edda.
-            </div>
+            <div className="character__descr">{description}</div>
             <div className="character__comics">Comics:</div>
             <ul className="character__comics-list">
-                <li className="character__comics-item">
-                    All-Winners Squad: Band of Heroes (2011) #3
-                </li>
-                <li className="character__comics-item">
-                    Alpha Flight (1983) #50
-                </li>
-                <li className="character__comics-item">
-                    Amazing Spider-Man (1999) #503
-                </li>
-                <li className="character__comics-item">
-                    Amazing Spider-Man (1999) #504
-                </li>
-                <li className="character__comics-item">
-                    AMAZING SPIDER-MAN VOL. 7: BOOK OF EZEKIEL TPB (Trade
-                    Paperback)
-                </li>
-                <li className="character__comics-item">
-                    Amazing-Spider-Man: Worldwide Vol. 8 (Trade Paperback)
-                </li>
-                <li className="character__comics-item">
-                    Asgardians Of The Galaxy Vol. 2: War Of The Realms (Trade
-                    Paperback)
-                </li>
-                <li className="character__comics-item">Vengeance (2011) #4</li>
-                <li className="character__comics-item">Avengers (1963) #1</li>
-                <li className="character__comics-item">Avengers (1996) #1</li>
+                {comics.items.length > 0
+                    ? null
+                    : `There are no comics with this character`}
+                {comics.items.map((comic, index) => {
+                    if (!comic) {
+                        return (
+                            <li key={index} className="character__comics-item">
+                                There is no comics
+                            </li>
+                        );
+                    }
+                    if (index > 9) {
+                        return;
+                    }
+                    return (
+                        <li key={index} className="character__comics-item">
+                            {comic.name}
+                        </li>
+                    );
+                })}
             </ul>
-        </div>
+        </>
     );
 };
 
