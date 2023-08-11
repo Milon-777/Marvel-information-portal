@@ -1,6 +1,6 @@
 import img from "./error.gif";
 
-const ErrorMessage = (): JSX.Element => {
+const ErrorMessage = () => {
     return (
         <img
             style={{

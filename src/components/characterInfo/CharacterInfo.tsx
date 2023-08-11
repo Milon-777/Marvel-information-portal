@@ -1,103 +1,83 @@
-import { Component, ErrorInfo } from "react";
+import { useState, useEffect } from "react";
 
-import MarvelService from "../../services/MarvelService";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import Skeleton from "../skeleton/Skeleton";
 
 import { CharacterInfo as Character } from "../../services/ResponseInterfaces";
+import MarvelService from "../../services/MarvelService";
 
 import "./characterInfo.scss";
 
-interface State {
-    character: Character;
-    loading: boolean;
-    error: boolean;
-}
 interface Props {
     characterId: number | null;
 }
 
-class CharacterInfo extends Component<Props, State> {
-    state = {
-        character: {
-            id: 0,
-            name: "",
-            description: "",
-            thumbnail: "",
-            homepage: "",
-            wiki: "",
-            comics: {
-                available: 0,
-                returned: 0,
-                collectionURI: "",
-                items: [],
-            },
+const CharacterInfo: React.FC<Props> = (props) => {
+    const [character, setCharacter] = useState<Character>({
+        id: 0,
+        name: "",
+        description: "",
+        thumbnail: "",
+        homepage: "",
+        wiki: "",
+        comics: {
+            available: 0,
+            returned: 0,
+            collectionURI: "",
+            items: [],
         },
-        loading: false,
-        error: false,
+    });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
+    const marvelService = new MarvelService();
+
+    useEffect(() => {
+        updateCharacter();
+    }, [props.characterId]);
+
+    const onCharacterLoaded = (character: Character): void => {
+        setCharacter(character);
+        setLoading(false);
     };
 
-    marvelService = new MarvelService();
-
-    componentDidMount(): void {
-        this.updateCharacter();
-    }
-
-    componentDidUpdate(
-        prevProps: Readonly<Props>,
-        prevState: Readonly<State>
-    ): void {
-        if (this.props.characterId !== prevProps.characterId) {
-            this.updateCharacter();
-        }
-    }
-
-    onCharacterLoaded = (character: Character): void => {
-        this.setState({ character, loading: false });
+    const onCharacterLoading = (): void => {
+        setLoading(true);
     };
 
-    onCharacterLoading = (): void => {
-        this.setState({ loading: true });
+    const onError = (): void => {
+        setLoading(false);
+        setError(true);
     };
 
-    onError = (): void => {
-        this.setState({ loading: false, error: true });
-    };
-
-    updateCharacter = () => {
-        const { characterId } = this.props;
+    const updateCharacter = () => {
+        const { characterId } = props;
         if (!characterId) {
             return;
         }
-
-        this.onCharacterLoading();
-
-        this.marvelService
+        onCharacterLoading();
+        marvelService
             .getCharacterById(characterId)
-            .then(this.onCharacterLoaded)
-            .catch(this.onError);
+            .then(onCharacterLoaded)
+            .catch(onError);
     };
 
-    render() {
-        const { character, loading, error } = this.state;
-        const skeleton = character.id || loading || error ? null : <Skeleton />;
-        const errorMessage = error ? <ErrorMessage /> : null;
-        const loadingSpinner = loading ? <Spinner /> : null;
-        const content = !(loading || error || !character.id) ? (
-            <View {...character} />
-        ) : null;
+    const skeleton = character.id || loading || error ? null : <Skeleton />;
+    const errorMessage = error ? <ErrorMessage /> : null;
+    const loadingSpinner = loading ? <Spinner /> : null;
+    const content = !(loading || error || !character.id) ? (
+        <View {...character} />
+    ) : null;
 
-        return (
-            <div className="character__info">
-                {skeleton}
-                {errorMessage}
-                {loadingSpinner}
-                {content}
-            </div>
-        );
-    }
-}
+    return (
+        <div className="character__info">
+            {skeleton}
+            {errorMessage}
+            {loadingSpinner}
+            {content}
+        </div>
+    );
+};
 
 const View: React.FC<Character> = (character) => {
     const { name, description, thumbnail, homepage, wiki, comics } = character;
