@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, RefCallback } from "react";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 
-import MarvelService from "../../services/MarvelService";
+import useMarvelService from "../../services/MarvelService";
 import { CharacterInfo } from "../../services/ResponseInterfaces";
 
 import "./characterList.scss";
@@ -12,13 +12,10 @@ type Props = { onCharacterSelected: (id: number) => void };
 
 const CharacterList: React.FC<Props> = (props) => {
     const [characters, setCharacters] = useState<CharacterInfo[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
     const [loadingNewCharacters, setLoadingNewCharacters] = useState(true);
     const [offset, setOffset] = useState(210);
     const [charactersEnded, setCharactersEnded] = useState(false);
-
-    const marvelService = new MarvelService();
+    const { error, loading, getAllCharacters } = useMarvelService();
     const itemRefs = useRef<HTMLLIElement[]>([]);
 
     useEffect(() => {
@@ -30,7 +27,7 @@ const CharacterList: React.FC<Props> = (props) => {
 
     useEffect(() => {
         if (loadingNewCharacters && !charactersEnded) {
-            onRequest();
+            onRequest(offset, true);
         }
     }, [loadingNewCharacters]);
 
@@ -58,31 +55,27 @@ const CharacterList: React.FC<Props> = (props) => {
         }
     };
 
-    const onRequest = (offsetValue: number = offset): void => {
+    const onRequest = (
+        offsetValue: number = offset,
+        initial: boolean
+    ): void => {
+        initial
+            ? setLoadingNewCharacters(false)
+            : setLoadingNewCharacters(true);
+
         console.log(`fetch`);
-        onCharactersLoading();
 
-        marvelService
-            .getAllCharacters(offsetValue)
+        getAllCharacters(offsetValue)
             .then(onCharactersLoaded)
-            .catch(onError)
             .finally(() => setLoadingNewCharacters(false));
-    };
-
-    const onCharactersLoading = (): void => {
-        setLoadingNewCharacters(true);
     };
 
     const onCharactersLoaded = (newCharacters: CharacterInfo[]): void => {
         setCharacters((characters) => [...characters, ...newCharacters]);
-        setLoading(false);
+
         setLoadingNewCharacters(false);
         setOffset((offset) => offset + 9);
         setCharactersEnded(newCharacters.length < 9 ? true : false);
-    };
-
-    const onError = (): void => {
-        setError(true);
     };
 
     function renderItems(characters: CharacterInfo[]): JSX.Element {
@@ -119,16 +112,15 @@ const CharacterList: React.FC<Props> = (props) => {
 
     const characterList = renderItems(characters);
     const errorMessage = error ? <ErrorMessage /> : null;
-    const spinner = loading ? <Spinner /> : null;
-    const content = !(loading || error) ? characterList : null;
+    const spinner = loading && !loadingNewCharacters ? <Spinner /> : null;
 
     return (
         <div className="character__list">
             {errorMessage}
             {spinner}
-            {content}
+            {characterList}
             <button
-                onClick={() => onRequest(offset)}
+                onClick={() => onRequest(offset, false)}
                 disabled={loadingNewCharacters}
                 style={{ display: charactersEnded ? "none" : "block" }}
                 className="button button__main button__long"

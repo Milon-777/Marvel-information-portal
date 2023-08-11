@@ -5,7 +5,7 @@ import ErrorMessage from "../errorMessage/ErrorMessage";
 import Skeleton from "../skeleton/Skeleton";
 
 import { CharacterInfo as Character } from "../../services/ResponseInterfaces";
-import MarvelService from "../../services/MarvelService";
+import useMarvelService from "../../services/MarvelService";
 
 import "./characterInfo.scss";
 
@@ -28,9 +28,7 @@ const CharacterInfo: React.FC<Props> = (props) => {
             items: [],
         },
     });
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
-    const marvelService = new MarvelService();
+    const { error, loading, getCharacterById, clearError } = useMarvelService();
 
     useEffect(() => {
         updateCharacter();
@@ -38,16 +36,6 @@ const CharacterInfo: React.FC<Props> = (props) => {
 
     const onCharacterLoaded = (character: Character): void => {
         setCharacter(character);
-        setLoading(false);
-    };
-
-    const onCharacterLoading = (): void => {
-        setLoading(true);
-    };
-
-    const onError = (): void => {
-        setLoading(false);
-        setError(true);
     };
 
     const updateCharacter = () => {
@@ -55,11 +43,9 @@ const CharacterInfo: React.FC<Props> = (props) => {
         if (!characterId) {
             return;
         }
-        onCharacterLoading();
-        marvelService
-            .getCharacterById(characterId)
-            .then(onCharacterLoaded)
-            .catch(onError);
+
+        clearError();
+        getCharacterById(characterId).then(onCharacterLoaded);
     };
 
     const skeleton = character.id || loading || error ? null : <Skeleton />;

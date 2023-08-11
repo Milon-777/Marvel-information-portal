@@ -1,43 +1,35 @@
+import useHttp from "../hooks/httpHook";
+
 import {
     CharacterResponse,
     CharacterFullInfo,
     CharacterInfo,
 } from "./ResponseInterfaces";
 
-class MarvelService {
-    private _apiBase = "https://gateway.marvel.com:443/v1/public/";
-    private _apiKey = "apikey=748e83ba2c9bf92e5102e19762a1d9d9";
-    private _baseOffset = 210;
+const useMarvelService = () => {
+    const { loading, request, error, clearError } = useHttp();
 
-    private getResource = async (
-        url: string
-    ): Promise<CharacterResponse> | never => {
-        let res: Response = await fetch(url);
+    const _apiBase = "https://gateway.marvel.com:443/v1/public/";
+    const _apiKey = "apikey=748e83ba2c9bf92e5102e19762a1d9d9";
+    const _baseOffset = 210;
 
-        if (!res.ok) {
-            throw new Error(`Could not fetch ${url}, status: ${res.status}`);
-        }
-
-        return await res.json();
-    };
-
-    public getAllCharacters = async (
-        offset: number = this._baseOffset
+    const getAllCharacters = async (
+        offset: number = _baseOffset
     ): Promise<Array<CharacterInfo>> => {
-        const res: CharacterResponse = await this.getResource(
-            `${this._apiBase}characters?limit=9&offset=${offset}&${this._apiKey}`
+        const res: CharacterResponse = await request(
+            `${_apiBase}characters?limit=9&offset=${offset}&${_apiKey}`
         );
-        return res.data.results.map(this._transformCharacter);
+        return res.data.results.map(_transformCharacter);
     };
 
-    public getCharacterById = async (id: number): Promise<CharacterInfo> => {
-        const res: CharacterResponse = await this.getResource(
-            `${this._apiBase}characters/${id}?${this._apiKey}`
+    const getCharacterById = async (id: number): Promise<CharacterInfo> => {
+        const res: CharacterResponse = await request(
+            `${_apiBase}characters/${id}?${_apiKey}`
         );
-        return this._transformCharacter(res.data.results[0]);
+        return _transformCharacter(res.data.results[0]);
     };
 
-    private _transformCharacter = (res: CharacterFullInfo): CharacterInfo => {
+    const _transformCharacter = (res: CharacterFullInfo): CharacterInfo => {
         return {
             id: res.id,
             name: res.name,
@@ -50,6 +42,8 @@ class MarvelService {
             comics: res.comics,
         };
     };
-}
 
-export default MarvelService;
+    return { loading, error, getAllCharacters, getCharacterById, clearError };
+};
+
+export default useMarvelService;
