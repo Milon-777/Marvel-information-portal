@@ -27,7 +27,7 @@ const CharacterList: React.FC<Props> = (props) => {
 
     useEffect(() => {
         if (loadingNewCharacters && !charactersEnded) {
-            onRequest(offset, true);
+            onRequest(offset, false);
         }
     }, [loadingNewCharacters]);
 

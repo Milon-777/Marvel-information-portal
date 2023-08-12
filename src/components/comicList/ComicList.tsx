@@ -1,4 +1,5 @@
 import { RefCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import Spinner from "../spinner/Spinner";
@@ -25,7 +26,7 @@ const ComicsList = () => {
 
     useEffect(() => {
         if (loadingNewComics && !charactersEnded) {
-            onRequest(offset, true);
+            onRequest(offset, false);
         }
     }, [loadingNewComics]);
 
@@ -82,7 +83,7 @@ const ComicsList = () => {
                     className="comic__item"
                     key={index}
                 >
-                    <a href="#">
+                    <Link to={`/comics/${comic.id}`}>
                         <img
                             src={comic.thumbnail}
                             alt={comic.title}
@@ -90,7 +91,7 @@ const ComicsList = () => {
                         />
                         <div className="comic__item-name">{comic.title}</div>
                         <div className="comic__item-price">{comic.price}</div>
-                    </a>
+                    </Link>
                 </li>
             );
         });

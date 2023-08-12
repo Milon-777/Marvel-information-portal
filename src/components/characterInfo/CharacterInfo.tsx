@@ -8,6 +8,7 @@ import { CharacterInfo as Character } from "../../services/ResponseInterfaces";
 import useMarvelService from "../../services/MarvelService";
 
 import "./characterInfo.scss";
+import { Link } from "react-router-dom";
 
 interface Props {
     characterId: number | null;
@@ -65,7 +66,7 @@ const CharacterInfo: React.FC<Props> = (props) => {
     );
 };
 
-const View: React.FC<Character> = (character) => {
+const View = (character: Character): JSX.Element => {
     const { name, description, thumbnail, homepage, wiki, comics } = character;
 
     return (
@@ -101,9 +102,10 @@ const View: React.FC<Character> = (character) => {
                     if (index > 9) {
                         return;
                     }
+                    const comicId = comic.resourceURI.substring(43);
                     return (
                         <li key={index} className="character__comics-item">
-                            {comic.name}
+                            <Link to={`/comics/${comicId}`}>{comic.name}</Link>
                         </li>
                     );
                 })}
