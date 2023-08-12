@@ -7,6 +7,7 @@ import CharacterInfo from "../characterInfo/CharacterInfo";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 
 import decoration from "../../resources/img/vision.png";
+import ComicsList from "../comicList/ComicList";
 
 interface State {
     selectedCharacter: null | number;
@@ -23,7 +24,7 @@ const App = () => {
         <div className="app">
             <AppHeader />
             <main>
-                <ErrorBoundary>
+                {/* <ErrorBoundary>
                     <RandomCharacter />
                 </ErrorBoundary>
                 <div className="character__content">
@@ -32,7 +33,8 @@ const App = () => {
                         <CharacterInfo characterId={selectedCharacter} />
                     </ErrorBoundary>
                 </div>
-                <img className="bg-decoration" src={decoration} alt="vision" />
+                <img className="bg-decoration" src={decoration} alt="vision" /> */}
+                <ComicsList />
             </main>
         </div>
     );

@@ -12,7 +12,7 @@ type Props = { onCharacterSelected: (id: number) => void };
 
 const CharacterList: React.FC<Props> = (props) => {
     const [characters, setCharacters] = useState<CharacterInfo[]>([]);
-    const [loadingNewCharacters, setLoadingNewCharacters] = useState(true);
+    const [loadingNewCharacters, setLoadingNewCharacters] = useState(true); //can be error here
     const [offset, setOffset] = useState(210);
     const [charactersEnded, setCharactersEnded] = useState(false);
     const { error, loading, getAllCharacters } = useMarvelService();
