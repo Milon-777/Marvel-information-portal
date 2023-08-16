@@ -6,6 +6,7 @@ import CharacterInfo from "../characterInfo/CharacterInfo";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 
 import decoration from "../../resources/img/vision.png";
+import CharacterSearchForm from "../characterSearchForm/CharacterSearchForm";
 
 const MainPage = () => {
     const [selectedCharacter, selectCharacter] = useState<number | null>(null);
@@ -20,10 +21,17 @@ const MainPage = () => {
                 <RandomCharacter />
             </ErrorBoundary>
             <div className="character__content">
-                <CharacterList onCharacterSelected={onCharacterSelected} />
                 <ErrorBoundary>
-                    <CharacterInfo characterId={selectedCharacter} />
+                    <CharacterList onCharacterSelected={onCharacterSelected} />
                 </ErrorBoundary>
+                <div>
+                    <ErrorBoundary>
+                        <CharacterInfo characterId={selectedCharacter} />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                        <CharacterSearchForm />
+                    </ErrorBoundary>
+                </div>
             </div>
             <img className="bg-decoration" src={decoration} alt="vision" />
         </>

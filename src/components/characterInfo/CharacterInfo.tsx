@@ -9,6 +9,7 @@ import useMarvelService from "../../services/MarvelService";
 
 import "./characterInfo.scss";
 import { Link } from "react-router-dom";
+import SearchBar from "../characterSearchForm/CharacterSearchForm";
 
 interface Props {
     characterId: number | null;

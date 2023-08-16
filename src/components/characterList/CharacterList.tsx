@@ -18,12 +18,12 @@ const CharacterList: React.FC<Props> = (props) => {
     const { error, loading, getAllCharacters } = useMarvelService();
     const itemRefs = useRef<HTMLLIElement[]>([]);
 
-    useEffect(() => {
-        window.addEventListener("scroll", onScroll);
-        return () => {
-            window.removeEventListener("scroll", onScroll);
-        };
-    }, []);
+    // useEffect(() => {
+    //     window.addEventListener("scroll", onScroll);
+    //     return () => {
+    //         window.removeEventListener("scroll", onScroll);
+    //     };
+    // }, []);
 
     useEffect(() => {
         if (loadingNewCharacters && !charactersEnded) {

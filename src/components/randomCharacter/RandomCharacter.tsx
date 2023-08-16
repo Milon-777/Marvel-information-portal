@@ -11,7 +11,7 @@ import mjolnir from "../../resources/img/mjolnir.png";
 
 interface Character extends CharacterInfo {}
 
-const RandomCharacter = () => {
+const RandomCharacter = (): JSX.Element => {
     const [character, setCharacter] = useState<Character>({
         id: 0,
         name: "",

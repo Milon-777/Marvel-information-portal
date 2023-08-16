@@ -1,62 +1,16 @@
-import { useParams, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
-
-import Spinner from "../../spinner/Spinner";
-import ErrorMessage from "../../errorMessage/ErrorMessage";
-import Skeleton from "../../skeleton/Skeleton";
-
-import { ComicInfo } from "../../../services/ResponseInterfaces";
-import useMarvelService from "../../../services/MarvelService";
+import { Link } from "react-router-dom";
 
 import "./singleComicPage.scss";
+import { CharacterInfo, ComicInfo } from "../../../services/ResponseInterfaces";
 
-const SingleComicPage = () => {
-    const { comicId } = useParams();
-    const [comic, setComic] = useState<ComicInfo>({
-        id: 0,
-        title: "",
-        description: "",
-        thumbnail: "",
-        language: "",
-        price: "",
-        pageCount: "",
-    });
-    const { error, loading, getComicById, clearError } = useMarvelService();
+interface Props {
+    data: ComicInfo;
+}
 
-    useEffect(() => {
-        updateComic();
-    }, [comicId]);
+const SingleComicPage: React.FC<Props> = ({ data }) => {
+    const { title, description, pageCount, thumbnail, language, price } = data;
 
-    const updateComic = () => {
-        if (!comicId) {
-            return;
-        }
-
-        clearError();
-        getComicById(Number(comicId)).then(onComicLoaded);
-    };
-
-    const onComicLoaded = (comic: ComicInfo): void => {
-        setComic(comic);
-    };
-
-    const errorMessage = error ? <ErrorMessage /> : null;
-    const loadingSpinner = loading ? <Spinner /> : null;
-    const content = !(loading || error || !comic.id) ? (
-        <View {...comic} />
-    ) : null;
-
-    return (
-        <>
-            {errorMessage}
-            {loadingSpinner}
-            {content}
-        </>
-    );
-};
-
-const View: React.FC<ComicInfo> = (comic): JSX.Element => {
-    const { title, description, thumbnail, language, price, pageCount } = comic;
+    console.log(data);
 
     return (
         <div className="single-comic">
@@ -65,7 +19,7 @@ const View: React.FC<ComicInfo> = (comic): JSX.Element => {
                 <h2 className="single-comic__name">{title}</h2>
                 <p className="single-comic__descr">{description}</p>
                 <p className="single-comic__descr">{pageCount}</p>
-                <p className="single-comic__descr">{language}</p>
+                <p className="single-comic__descr">Language: {language}</p>
                 <div className="single-comic__price">{price}</div>
             </div>
             <Link to="/comics" className="single-comic__back">
