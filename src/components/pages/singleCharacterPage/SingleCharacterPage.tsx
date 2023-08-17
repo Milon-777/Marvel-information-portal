@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { CharacterInfo } from "../../../services/ResponseInterfaces";
 import "./singleCharacterPage.scss";
 
@@ -17,6 +18,9 @@ const SingleCharacterPage: React.FC<Props> = ({ data }) => {
                 <h2 className="single-character__name">{name}</h2>
                 <p className="single-character__descr">{description}</p>
             </div>
+            <Link to="/" className="button button__main">
+                <div className="inner">Back to all</div>
+            </Link>
         </div>
     );
 };

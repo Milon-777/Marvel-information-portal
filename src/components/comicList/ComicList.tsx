@@ -36,18 +36,6 @@ const ComicsList = () => {
         }
     };
 
-    // const focusOnCharacter = (id: number): void => {
-    //     itemRefs.current.forEach((item) => {
-    //         if (item) {
-    //             item.classList.remove("character__item_selected");
-    //         }
-    //     });
-    //     if (itemRefs.current[id]) {
-    //         itemRefs.current[id].classList.add("character__item_selected");
-    //         itemRefs.current[id].focus();
-    //     }
-    // };
-
     const onScroll = (): void => {
         if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
             setLoadingNewComics(true);
